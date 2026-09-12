@@ -1,0 +1,48 @@
+[project]
+name = "paocseq"
+version = "0.1.0"
+description = "Python port of the aocseq R package: trace/clonotype-aware annotation of single-cell (10x Genomics) gene expression + VDJ data, built on AnnData/Scanpy."
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "MIT" }
+authors = [
+    { name = "aocseq / paocseq contributors" },
+]
+keywords = ["single-cell", "scRNA-seq", "10x Genomics", "VDJ", "CITE-seq", "clonotype", "anndata", "scanpy"]
+
+# Kept intentionally short: anndata + scanpy give us the "Seurat-object equivalent"
+# (AnnData) and a 10x Genomics reader, matplotlib gives us plotting, and
+# numpy/scipy/pandas are the array/stat backbone. The EM demultiplexing
+# algorithm (originally base R) is re-implemented directly with numpy arrays
+# in paocseq.demux. The Mahalanobis-distance and isolation-forest solvers
+# (originally solvers.cpp, an Rcpp extension) are ported to plain C++ in
+# csrc/solvers.cpp and compiled as the paocseq._solvers_ext extension module
+# (see setup.py) -- no extra *runtime* dependency, just a C++ compiler at
+# install time; paocseq falls back to a pure-numpy implementation
+# (paocseq._solvers_py) automatically if that compiler isn't available.
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.13",
+    "pandas>=2.2",
+    "anndata>=0.10",
+    "scanpy>=1.10",
+    "matplotlib>=3.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[build-system]
+# setuptools (rather than hatchling) so setup.py's ext_modules (the compiled
+# C++ solvers extension, csrc/solvers.cpp) gets built as part of the wheel.
+# numpy is needed at build time too, for numpy.get_include()'s C headers.
+requires = ["setuptools>=68", "wheel", "numpy>=1.26"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

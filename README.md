@@ -1,5 +1,7 @@
 # paocseq 0.1.0: A python package for mixed cell type annotation following the activation of cells & sequencing.
 
+This is a first, testable pass at a port of the R package [`aocseq`](https://github.com/MaeWoods/aocseq) -- it was developed for educational purposes as part of a topic of conversation for the [`Gatherverse Women’s AI Summit 2026`](https://gatherverse.org/women-ai-2026/). It was generated using the Claude free plan and Claude Sonnet 5. The code was ported in this way so that the results can be replicated without restriction. Several changes have been made to the original ported code so that the software runs in the same way as aocseq on example single cell RNA sequencing data. There were several issues with memory allocation using example data as apposed to the test data provided with the AI port, along with issues that require catch blocks for real data inconsistencies and some contextual issues that did not align with the original software. These issues were fixed after the port such that the version uploaded here is a combination of the AI generated port and amendments so that it is functional when used with experimental data.
+
 **paocseq** is a suite of statistical tools for the analysis of multimodal immunosequencing data. 
 
 The purpose of this statistical tool is to quantify single cell data and provide **1)** A sample list of mixed cell types with accompanying data sheets to collate detectable clonotypes that are present in the blood or tissue and **2)** To detect, score and rank cells with optimal or desirable characteristics. Characteristics are defined by the gene expression of cells that are considered of interest because of their response to perturbation. 
@@ -21,7 +23,7 @@ Specifically, this is a software package of statistical tools that can be used t
 
 # initial porting using Claude Sonnet 5
 
-The initial Python port of the R package [`aocseq`](.) was generated using Claude desktop.
+The initial Python port of the R package [`aocseq`](https://github.com/MaeWoods/aocseq) was generated using Claude desktop as part of a project under the Free plan for educational purposes.
 
 Where `aocseq` stored data in Seurat objects, `paocseq` uses
 [`AnnData`](https://anndata.readthedocs.io/) (via
@@ -82,8 +84,7 @@ reference = pq.make_reference(adata_list[0], gene_list=["IFNG", "TNF"])
 scored = pq.classify_cells(adata_list[1], reference, gene_list=["IFNG", "TNF"], distance=0)
 ```
 
-See `examples/getting_started.py` for a runnable end-to-end example against
-synthetic data (no real 10x data required), and the module docstrings in
+See `examples/example.py` for a runnable end-to-end example that works with an example dataset. There were initial problems with the port that required some changes to be made to the code to split the anndata import into chunks. WIthout this change the code failed at runtime due to insufficient memory allocation. Interestingly, this same split of the data was not needed in R. See the module docstrings in
 `src/paocseq/*.py` for the mapping from each Python function back to its
 original R source file/function name.
 
@@ -100,7 +101,8 @@ original R source file/function name.
 | `Genomics.R`              | `RankTCRs`                                       | `paocseq.genomics`        |
 | `Plotting.R`              | `QCPlot`, `UMAPReduce`, `SegmentPlot`, `SaveHeatmap` | `paocseq.plotting`    |
 | `References.R`            | `MakeReference`                                  | `paocseq.references`      |
-| `solvers.cpp`             | `GetMahalanobis`, `isoForest`/`tree`             | `paocseq._solvers`        |
+| `GetMahalanobis.cpp`             | `GetMahalanobis`         | `paocseq._solvers`        |
+| `isoForest.cpp`             | `isolation_forest`         | `paocseq._solvers`        |
 
 ### What was intentionally *not* ported
 
@@ -121,6 +123,3 @@ original R source file/function name.
   `SaveHeatmap`'s dataset-specific hard-coded column indices were
   generalized into `paocseq.plotting.expression_heatmap`.
 
-This is a first, testable pass at the port -- please try it against your
-real 10x + VDJ data and let me know what breaks or what's missing so the
-next iteration can fix it.
